@@ -28,11 +28,20 @@ def enumerate_all(csv):
 
 
 class DataObject:
+    expect = []
+    predict = []
+
     def __init__(self, name, data, dimensions_range, class_index):
         self.name = name
-        self.data = data
-        self.dimensions_range = dimensions_range
-        self.class_index = class_index
+        self.dimensions = dimensions_range[1]
+
+        data = data.replace('?', np.nan)
+        data = data.dropna()
+        x_prime = data.iloc[:, dimensions_range[0]:dimensions_range[1]].values
+        self.x = preprocessing.scale(x_prime)
+        self.y = data.iloc[:, class_index].values
+
+
 
 
 def load_data():
@@ -50,8 +59,6 @@ def load_data():
     csv = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer/breast-cancer.data')
     csv.columns = ['Class identifier', 'Age', 'Menopause', 'Tumor-size', 'Inv-nodes', 'Node-caps', 'Deg-malig',
                    'Breast', 'Breast-Quad', 'Irradiat']
-    csv = csv.replace('?', np.nan)
-    csv = csv.dropna()
     enumerate_all(csv)
     DataList.append(DataObject('Cancer', csv, [1, 9], 0))
 
@@ -61,8 +68,6 @@ def load_data():
                    'Liver Big', 'Liver Firm', 'Spleen Palpable',
                    'Spiders', 'Ascites', 'Varices', 'Bilirubin', 'Alk Phosphate', 'SGOT', 'Albumin', 'Protime',
                    'Histology']
-    csv = csv.replace('?', np.nan)
-    csv = csv.dropna()
     enumerate_data(csv, ['Sex', 'Steroid', 'AntiVirals', 'Fatigue', 'Malaise', 'Anorexia', 'Liver Big', 'Liver Firm',
                          'Spleen Palpable',
                          'Spiders', 'Ascites', 'Varices', 'Histology'])
@@ -74,15 +79,16 @@ def load_data():
                    'Barium', 'Iron', 'Class identifier']
     DataList.append(DataObject('Glass', csv, [1, 10], 10))
 
-    # Echocardiogram data
+    # Lung Cancer Data
+    csv = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/lung-cancer/lung-cancer.data')
+    DataList.append(DataObject('Lung cancer', csv, [1, 56], 0))
 
+    # Echocardiogram data
     csv = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/echocardiogram/echocardiogram.data',
                       error_bad_lines=False)
     csv.columns = ['Survival', 'Still-alive', 'Age-at-heart-attack', 'Pericardial-effusion', 'Fractional-shortening',
                    'EPSS', 'LVDD', 'Wall-motion-score',
                    'Wall-motion-index', 'Mult', 'Name', 'Group', 'Alive-at-1']
-    csv = csv.replace('?', np.nan)
-    csv = csv.dropna()
     del csv['Name']
     # graph - https://realpython.com/pandas-plot-python/
     # csv['Alive-at-1'].value_counts().plot(kind='bar').set_title('Echocardiogram Outcome')
