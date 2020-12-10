@@ -30,6 +30,7 @@ def enumerate_all(csv):
 class DataObject:
     expect = []
     predict = []
+    red_x = []
 
     def __init__(self, name, data, dimensions_range, class_index):
         self.name = name
@@ -38,7 +39,8 @@ class DataObject:
         data = data.replace('?', np.nan)
         data = data.dropna()
         x_prime = data.iloc[:, dimensions_range[0]:dimensions_range[1]].values
-        self.x = preprocessing.scale(x_prime)
+        self.x = x_prime
+
         self.y = data.iloc[:, class_index].values
 
 
