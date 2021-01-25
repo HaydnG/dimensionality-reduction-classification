@@ -1,29 +1,21 @@
 from sklearn import neighbors
-from sklearn import preprocessing
 from sklearn import metrics
-from sklearn.model_selection import train_test_split
-
-import data
-
-testDataPercent = 0.30
-selectionSeed = 3
-
-def apply_kneighbors_classifier(ID: data.IterationData):
-
-    ID.xTrainingData, ID.xTestData, ID.yTrainingData, ID.yTestData = train_test_split(ID.xData, ID.yData, test_size=testDataPercent,
-                                                        random_state=selectionSeed)  ##random_state=2 data seed
 
 
-    ID.xTrainingData = preprocessing.scale(ID.xTrainingData)
-    ID.xTestData = preprocessing.scale(ID.xTestData)
+class ClassificationMethod:
+    def __init__(self, name, method):
+        self.name = name
+        self.method = method
 
-    clf = neighbors.KNeighborsClassifier()
+    def execute(self, xTrainingData, xTestData, yTrainingData, yTestData):
+        yTestPredictedData = self.method(xTrainingData, xTestData, yTrainingData, yTestData)
 
-    clf.fit(ID.xTrainingData, ID.yTrainingData)
-
-
-    ID.yTestPredictedData = clf.predict(ID.xTestData)
-    ID.score = metrics.accuracy_score(ID.yTestData, ID.yTestPredictedData)
+        return metrics.accuracy_score(yTestData, yTestPredictedData)
 
 
-    return ID.score
+classificationAlgorithms: ClassificationMethod = []
+
+
+classificationAlgorithms.append(ClassificationMethod("KNeighbors",
+                                           lambda xTrainingData, xTestData, yTrainingData, yTestData:
+                                           neighbors.KNeighborsClassifier().fit(xTrainingData, yTrainingData).predict(xTestData)))

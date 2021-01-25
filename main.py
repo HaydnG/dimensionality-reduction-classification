@@ -1,61 +1,44 @@
 import sklearn
 from sklearn.manifold import LocallyLinearEmbedding, Isomap
-import data
-import classification
+import data, classification, reduction
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+
+def main():
+    print("Hello World!")
+
+if __name__ == "__main__":
+    main()
 
 DataList = data.load_data()
+testDataPercent = 0.30
+selectionSeed = 3
 
 for do in DataList:
     print("\n\n#### " + do.name + " ####")
-    graph = do.newGraph("KNeighbor")
 
-    #Original score, no reduction
+    for method in reduction.reductionAlgorithms:
 
-    graph.firstDataPoint = data.IterationData(do.x, do.y, do.dimensions)
+        dataset = do.newReducedDataSet(method.name)
+        for dimension in range(do.maxDimensionalReduction, 0, -1):
 
-    score = classification.apply_kneighbors_classifier(graph.firstDataPoint)
-    print("Test sample size (",len(do.expect),"), Training size (", len(do.trained),")")
-    print("BaseScore (",do.dimensions,"dimensions): ", score)
+            if method.capByClasses and dimension > do.classes - 1:
+                continue
 
+            reducedData = method.execute(dimension, do.x, do.y)
 
-    # Run dimensionality reduction on every dimension, and find best score.
-    algorithm = do.newAlgorithm("LocallyLinearEmbedding")
-    while algorithm.dimensionIterator > 1:
-        embedding = LocallyLinearEmbedding(n_components=algorithm.dimensionIterator)
+            xTrainingData, xTestData, dataset.yTrainingData, dataset.yTestData = train_test_split(reducedData, do.y,
+                                                                                              test_size=testDataPercent,
+                                                                                              random_state=selectionSeed)  ##random_state=2 data seed
+            xTrainingData = preprocessing.scale(xTrainingData)
+            xTestData = preprocessing.scale(xTestData)
 
-        reducedX = embedding.fit_transform(do.x)
+            data = dataset.addReducedData(reducedData, xTrainingData, xTestData, dimension)
 
-        point = do.newDataPoint(reducedX, do.y, algorithm.dimensionIterator)
+            for classifier in classification.classificationAlgorithms:
+                temp_score = classifier.execute(xTrainingData, xTestData, dataset.yTrainingData, dataset.yTestData)
+                print(method.name + " with (",classifier.name,") classifier: ReductionScore (", temp_score, ") Dimension: (", dimension, "), classes: (",
+                      do.classes, ")")
+                data.addClassifierScore(classifier.name, temp_score)
 
-        temp_score = classification.apply_kneighbors_classifier(point)
-
-        if temp_score > algorithm.topScore:
-            algorithm.topScore = temp_score
-            algorithm.topDimensions = algorithm.dimensionIterator
-
-        algorithm.dimensionIterator -=1
-
-    print(algorithm.name + ": ReductionScore (", algorithm.topDimensions, "dimensions) : ", algorithm.topScore)
-        # Run dimensionality reduction on every dimension, and find best score.
-    algorithm = do.newAlgorithm("ISOMAP")
-    while algorithm.dimensionIterator > 1:
-        iso = Isomap(n_neighbors=6, n_components=algorithm.dimensionIterator)
-        iso.fit(do.x)
-        reducedX = iso.transform(do.x)
-
-        point = do.newDataPoint(reducedX, do.y, algorithm.dimensionIterator)
-
-        temp_score = classification.apply_kneighbors_classifier(point)
-
-        if temp_score > algorithm.topScore:
-            algorithm.topScore = temp_score
-            algorithm.topDimensions = do.dimensionIterator
-
-        algorithm.dimensionIterator -= 1
-
-    do.createGraphs()
-
-    print(algorithm.name + ": ReductionScore (",algorithm.topDimensions,"dimensions) : ", algorithm.topScore)
-
-
-
+    do.createGraph()
