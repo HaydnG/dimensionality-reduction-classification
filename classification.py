@@ -1,5 +1,6 @@
 from sklearn import neighbors
 from sklearn import metrics
+from timeit import default_timer as timer
 
 
 class ClassificationMethod:
@@ -8,9 +9,13 @@ class ClassificationMethod:
         self.method = method
 
     def execute(self, xTrainingData, xTestData, yTrainingData, yTestData):
+        start = timer()
         yTestPredictedData = self.method(xTrainingData, xTestData, yTrainingData, yTestData)
+        end = timer()
 
-        return metrics.accuracy_score(yTestData, yTestPredictedData)
+
+
+        return metrics.accuracy_score(yTestData, yTestPredictedData), (end - start) * 1000
 
 
 classificationAlgorithms: ClassificationMethod = []

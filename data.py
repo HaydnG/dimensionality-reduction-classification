@@ -4,6 +4,10 @@ import numpy as np
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.patheffects as pe
+from matplotlib.legend_handler import HandlerLine2D, HandlerTuple
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 
 np.set_printoptions(precision=4, suppress=True)
 plt.style.use('seaborn-whitegrid')
@@ -37,15 +41,18 @@ def enumerate_all(csv):
     return csv
 
 class ReducedData:
-    def __init__(self, xData, xTrainingData , xTestData, dimension):
+    def __init__(self, xData, xTrainingData , xTestData, dimension, elapsedTime):
         self.xData = xData
         self.xTrainingData = xTrainingData
         self.xTestData = xTestData
         self.dimension = dimension
         self.classifierScore = {}
+        self.classifierTime = {}
+        self.elapsedTime = elapsedTime
 
-    def addClassifierScore(self, name, score):
+    def addClassifierScore(self, name, score, elapsedTime):
         self.classifierScore[name] = score
+        self.classifierTime[name] = elapsedTime
 
 
 class ReducedDataSet:
@@ -55,8 +62,8 @@ class ReducedDataSet:
         self.yTrainingData = None
         self.yTestData = None
 
-    def addReducedData(self, xData, xTrainingData , xTestData, Dimension):
-        self.reducedData.append(ReducedData(xData, xTrainingData , xTestData, Dimension))
+    def addReducedData(self, xData, xTrainingData , xTestData, Dimension, elapsedTime):
+        self.reducedData.append(ReducedData(xData, xTrainingData , xTestData, Dimension, elapsedTime))
         return self.reducedData[-1]
 
 
@@ -92,14 +99,11 @@ class DataObject:
         scoreData = []
         for datasets in self.reducedDataSets:
             scores = [ds.classifierScore["KNeighbors"] for ds in datasets.reducedData]
-            #scores.insert(0, gdb.firstDataPoint.score)
             scoreData.append(scores)
 
             dimensions = [ds.dimension for ds in datasets.reducedData]
-            #dimensions.insert(0, gdb.firstDataPoint.dimension)
 
-
-        df = pd.DataFrame(np.c_[scoreData[0], scoreData[1]], index=np.arange(0, self.graphLabelMax, 1).tolist(),
+        df = pd.DataFrame(np.c_[scoreData[0], scoreData[1], scoreData[2]], index=np.arange(0, self.maxDimensionalReduction, 1).tolist(),
                           columns=[rds.name for rds in self.reducedDataSets])
 
         ax = df.plot.bar()
@@ -107,18 +111,32 @@ class DataObject:
         lines, labels = ax.get_legend_handles_labels()
 
         plt.legend(lines, labels, title='Reduction Algorithm',
-                   bbox_to_anchor=(0.5, -0.3), loc="lower center",
+                   bbox_to_anchor=(0, -0.3), loc="lower left",
                    ncol=2, borderaxespad=0.)
         plt.subplots_adjust(wspace=2)
         plt.title(
             self.name,
             loc='right')
-        plt.title(gdb.name, loc='left')
-        plt.ylabel("Prediction accuracy")
+        plt.title("KNeighbors", loc='left')
+        plt.ylabel("Prediction accuracy (bars)")
         plt.xlabel("Number of dimensions")
         plt.margins(y=0)
 
-        plt.xticks(list(range(0, self.graphLabelMax)), dimensions)
+        plt.xticks(list(range(0, self.maxDimensionalReduction)), dimensions)
+
+        ax2 = ax.twinx()
+        for datasets in self.reducedDataSets:
+            ax2.plot(list(range(0, self.maxDimensionalReduction)),
+                            [ds.elapsedTime for ds in datasets.reducedData],marker='o',markersize=4, lw=2, markeredgecolor='black')
+
+        ax2.legend(handles=[Line2D([0], [0], marker='o', color='black', label='Reduction Time',
+                                  markerfacecolor='red', markersize=10)],
+                   bbox_to_anchor=(1, -0.3),title='Execution Time (ms)', loc="lower right",
+                   ncol=1, borderaxespad=0.)
+
+
+        plt.ylabel("Algorithm execution time (ms) (line)")
+        ax2.set_ylim(bottom=0)
 
         plt.savefig('graphs/' + self.name + '.png', bbox_inches='tight')
         plt.show()

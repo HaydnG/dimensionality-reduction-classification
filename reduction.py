@@ -1,6 +1,11 @@
 from sklearn.manifold import LocallyLinearEmbedding, Isomap
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.model_selection import train_test_split
+from sklearn import preprocessing
+from timeit import default_timer as timer
 
+testDataPercent = 0.30
+selectionSeed = 3
 
 class ReductionMethod:
     def __init__(self, capByClasses, name, method):
@@ -8,8 +13,19 @@ class ReductionMethod:
         self.method = method
         self.capByClasses = capByClasses
 
-    def execute(self, dimensions, x, y):
-        return self.method(dimensions, x, y)
+    def execute(self, dimension, x, y, dataset):
+        start = timer()
+        reducedData = self.method(dimension, x, y)
+        end = timer()
+
+
+        xTrainingData, xTestData, dataset.yTrainingData, dataset.yTestData = train_test_split(reducedData, y,
+                                                                                              test_size=testDataPercent,
+                                                                                              random_state=selectionSeed)  ##random_state=2 data seed
+        xTrainingData = preprocessing.scale(xTrainingData)
+        xTestData = preprocessing.scale(xTestData)
+
+        return dataset.addReducedData(reducedData, xTrainingData, xTestData, dimension, (end - start) * 1000)
 
 
 
