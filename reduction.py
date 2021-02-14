@@ -4,8 +4,11 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from timeit import default_timer as timer
 
-testDataPercent = 0.30
+testDataPercent = 0.33
 selectionSeed = 3
+
+def prepareData(x, y):
+    return train_test_split(x, y, test_size=testDataPercent,random_state=selectionSeed)  ##random_state=2 data seed
 
 class ReductionMethod:
     def __init__(self, capByClasses, name, method):
@@ -14,14 +17,15 @@ class ReductionMethod:
         self.capByClasses = capByClasses
 
     def execute(self, dimension, x, y, dataset):
+        x = x.values
+        y = y.values
+
         start = timer()
         reducedData = self.method(dimension, x, y)
         end = timer()
 
+        xTrainingData, xTestData, dataset.yTrainingData, dataset.yTestData = prepareData(reducedData, y)
 
-        xTrainingData, xTestData, dataset.yTrainingData, dataset.yTestData = train_test_split(reducedData, y,
-                                                                                              test_size=testDataPercent,
-                                                                                              random_state=selectionSeed)  ##random_state=2 data seed
         xTrainingData = preprocessing.scale(xTrainingData)
         xTestData = preprocessing.scale(xTestData)
 
@@ -34,10 +38,10 @@ reductionAlgorithms: ReductionMethod = []
 
 
 
-reductionAlgorithms.append(ReductionMethod(False, "LocallyLinearEmbedding",
-                                           lambda dimensions, x, y:
-                                           LocallyLinearEmbedding(n_components=dimensions).fit_transform(x)))
 
+reductionAlgorithms.append(ReductionMethod(False, "LLE",
+                                           lambda dimensions, x, y:
+                                           LocallyLinearEmbedding(n_components=dimensions, eigen_solver='arpack').fit_transform(x)))
 
 reductionAlgorithms.append(ReductionMethod(True, "LDA",
                                            lambda dimensions, x, y:
@@ -46,4 +50,5 @@ reductionAlgorithms.append(ReductionMethod(True, "LDA",
 reductionAlgorithms.append(ReductionMethod(False, "Isomap",
                                            lambda dimensions, x, y:
                                            Isomap(n_components=dimensions).fit_transform(x)))
+
 
