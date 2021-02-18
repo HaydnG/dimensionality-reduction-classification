@@ -2,22 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b9704cd1-d8f5-4de5-b4fe-905f4778724f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/classification.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Cancer.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Glass.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Hepatitis.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Parkinsons.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Poker.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphs/Wine.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reduction.py" beforeDir="false" afterPath="$PROJECT_DIR$/reduction.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +87,8 @@
       <workItem from="1612725091804" duration="4983000" />
       <workItem from="1612783890796" duration="2318000" />
       <workItem from="1612910931192" duration="2126000" />
-      <workItem from="1613315661856" duration="3444000" />
+      <workItem from="1613315661856" duration="4093000" />
+      <workItem from="1613639106480" duration="783000" />
     </task>
     <servers />
   </component>
